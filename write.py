@@ -16,17 +16,17 @@ api = TwitterAPI(
 USER = "locotamerbot"
 MIN_TEMPERATURE = 0.7
 
-textgen = textgenrnn()
+textgen = textgenrnn(config_path="textgenrnn_config.json", weights_path="textgenrnn_weights.hdf5", vocab_path="textgenrnn_vocab.json")
 textgen.load('textgenrnn_weights.hdf5')
 
 while True:
     # post a tweet
     rdn = random.random()
-    if rdn < 1/144:
+    if rdn < 1/72:
         temperature = MIN_TEMPERATURE + random.random() * (1 - MIN_TEMPERATURE)
         tweet = textgen.generate(temperature=temperature, return_as_list=True)
         r = api.request('statuses/update', {'status': tweet[0]})
-        print('SUCCESS' if r.status_code == 200 else r.text)
+        print('Tweet SUCCESS' if r.status_code == 200 else r.text)
     time.sleep(60)
 
     # answer tweets
@@ -59,7 +59,7 @@ while True:
                 mentions = "@{}".format(item["user"]["screen_name"])
                 tweet = "{} {}".format(mentions, tweet)
                 r = api.request('statuses/update', {'status': tweet, 'in_reply_to_status_id': item["id_str"]})
-                print('SUCCESS' if r.status_code == 200 else r.text)
+                print('Reply SUCCESS' if r.status_code == 200 else r.text)
 
     print("sleeping")
     # check mentions 
