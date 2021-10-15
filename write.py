@@ -1,6 +1,7 @@
 from TwitterAPI import TwitterAPI
 import time
 import re
+import random
 
 from textgenrnn import textgenrnn
 
@@ -13,16 +14,20 @@ api = TwitterAPI(
 )
 
 USER = "locotamerbot"
+MIN_TEMPERATURE = 0.7
 
 textgen = textgenrnn()
 textgen.load('textgenrnn_weights.hdf5')
 
 while True:
     # post a tweet
-    # tweet = textgen.generate(temperature=0.9, return_as_list=True)
-    # r = api.request('statuses/update', {'status': tweet[0]})
-    # print('SUCCESS' if r.status_code == 200 else r.text)
-    # time.sleep(60)
+    rdn = random.random()
+    if rdn < 1/144:
+        temperature = MIN_TEMPERATURE + random.random() * (1 - MIN_TEMPERATURE)
+        tweet = textgen.generate(temperature=temperature, return_as_list=True)
+        r = api.request('statuses/update', {'status': tweet[0]})
+        print('SUCCESS' if r.status_code == 200 else r.text)
+    time.sleep(60)
 
     # answer tweets
     r = api.request('search/tweets', {'q': USER})
@@ -47,7 +52,8 @@ while True:
             if item["user"]["screen_name"] != USER:
                 text = re.sub(r'@[a-zA-Z0-9_]+', '', item["text"])
                 text = " ".join(text.split())
-                tweet = textgen.generate(prefix=text, temperature=0.9, return_as_list=True)
+                temperature = MIN_TEMPERATURE + random.random() * (1 - MIN_TEMPERATURE)
+                tweet = textgen.generate(prefix=text, temperature=temperature, return_as_list=True)
                 tweet = tweet[0][len(text):]
                 print("answering", item["text"])
                 mentions = "@{}".format(item["user"]["screen_name"])
