@@ -2,6 +2,7 @@ from TwitterAPI import TwitterAPI
 import time
 import re
 import random
+import unidecode
 
 from textgenrnn import textgenrnn
 
@@ -25,7 +26,7 @@ print("Starting locotamerbot")
 while True:
     # post a tweet
     rdn = random.random()
-    if rdn < 1/72:
+    if rdn < 1/50:
         temperature = MIN_TEMPERATURE + random.random() * (1 - MIN_TEMPERATURE)
         tweet = textgen.generate(temperature=temperature, return_as_list=True)
         r = api.request('statuses/update', {'status': tweet[0]})
@@ -58,7 +59,15 @@ while True:
                 temperature = MIN_TEMPERATURE + random.random() * (1 - MIN_TEMPERATURE)
                 tweet = textgen.generate(prefix=text, temperature=temperature, return_as_list=True)
                 tweet = tweet[0][len(text):]
+                tries = 0
+                while tries < 5 and not len(tweet):
+                    tweet = textgen.generate(prefix=unidecode.unidecode(text), temperature=temperature, return_as_list=True)
+                    tweet = tweet[0][len(text):]
+                    tries += 1
                 print("answering", item["text"])
+                if not len(tweet):
+                    print("error, trying again later")
+                    continue
                 mentions = "@{}".format(item["user"]["screen_name"])
                 tweet = "{} {}".format(mentions, tweet)
                 r = api.request('statuses/update', {'status': tweet, 'in_reply_to_status_id': item["id_str"]})
