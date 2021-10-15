@@ -1,0 +1,5 @@
+tensorflow==2.3.2
+tensorflow-gpu==2.3.2
+keras==2.3.0
+textgenrnn==2.0.0
+TwitterAPI==2.7.5

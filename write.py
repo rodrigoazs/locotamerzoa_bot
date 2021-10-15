@@ -5,6 +5,7 @@ import random
 
 from textgenrnn import textgenrnn
 
+print("Loading TwitterAPI")
 api = TwitterAPI(
     "CAByBGau3qyUrCzUuv68VGkVC",
     "yOxh3ltcQ8j6P4hmU09PIZ8XwLMfhVZT1IaEhshEfxmZYNJ81B",
@@ -16,9 +17,11 @@ api = TwitterAPI(
 USER = "locotamerbot"
 MIN_TEMPERATURE = 0.7
 
+print("Loading model")
 textgen = textgenrnn(config_path="textgenrnn_config.json", weights_path="textgenrnn_weights.hdf5", vocab_path="textgenrnn_vocab.json")
 textgen.load('textgenrnn_weights.hdf5')
 
+print("Starting locotamerbot")
 while True:
     # post a tweet
     rdn = random.random()
